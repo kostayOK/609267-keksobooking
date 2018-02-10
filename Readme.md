@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Костя Пугачев](https://up.htmlacademy.ru/javascript/12/user/609267).
-* Наставник: `Неизвестно`.
+* Наставник: `Вадим Шевяков`.
 
 ---
 
