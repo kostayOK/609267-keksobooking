@@ -48,7 +48,7 @@ var generateData = function () {
         'guests': numberRandom(1, 5),
         'checkin': timeCheckin[numberRandom(1, 3)],
         'checkout': timeDeparture[numberRandom(1, 3)],
-        'features': featuresHousing.splice(0, numberRandom(0, featuresHousing.length)),
+        'features': featuresHousing.slice(1, numberRandom(0, featuresHousing.length - 1)),
         'description': '',
         'photos': arrPhotos
       },
@@ -66,11 +66,9 @@ var createPin = function (obj) {
   /** отрисовка дом элимента button и добовление фотографии */
   var buttonLocation = document.createElement('button');
   buttonLocation.className = 'map__pin';
-  buttonLocation.style.height = '40' + 'px';
-  buttonLocation.style.width = '40' + 'px';
   buttonLocation.draggable = false;
-  buttonLocation.style.left = obj.location.x - 20 + 'px';
-  buttonLocation.style.top = obj.location.y - 40 + 'px';
+  buttonLocation.style.left = obj.location.x - 25 + 'px';
+  buttonLocation.style.top = obj.location.y - 70 + 'px';
   /** создание аватарки пользователя на карте */
   var imgButton = document.createElement('img');
   imgButton.src = '';
