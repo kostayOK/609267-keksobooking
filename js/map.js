@@ -22,9 +22,6 @@ var timeCheckin = ['12:00', '13:00', '14:00'];
 var timeDeparture = ['12:00', '13:00', '14:00'];
 /** особености жилья */
 var featuresHousing = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-// var featuresHousingRandom = featuresHousing.splice(0, numberRandom(0, featuresHousing.length));
-
-// console.log(featuresHousing.splice(0, numberRandom(0, featuresHousing.length)));
 /** масив фотографий */
 var arrPhotos = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -80,7 +77,6 @@ var createPin = function (obj) {
 };
 /** удаление класса сказано времменое решение */
 var sectionMap = document.querySelector('.map');
-sectionMap.classList.remove('map--faded');
 /** описание template ! внутринасти для размищения и замены */
 var descriptionTemplate = document.querySelector('template').content.querySelector('article.map__card');
 var choiceTypeHousing = function (arr) {
@@ -143,5 +139,75 @@ var createOffer = function (data) {
 var mapFaded = document.querySelector('.map__pins');
 var arrObj = generateData();
 renderMap(mapFaded, arrObj);
-var offer = createOffer(arrObj[2]);
-sectionMap.appendChild(offer);
+var labelsHandler = function (ev) {
+  /** поклюку на метку отрисоввываю предложение и удаляю */
+  /** складываю элименты для отрисовки в dom */
+  var mapCardPopup = sectionMap.querySelector('article.map__card');
+  if (ev.target.tagName === 'IMG') {
+    if (mapCardPopup) {
+      sectionMap.removeChild(mapCardPopup);
+    }
+    var prock = arrImgUrls.indexOf(ev.target.currentSrc.replace(window.location.origin + '/609267-keksobooking/', ''));
+    if (prock !== -1) {
+      var offer = createOffer(arrObj[prock]);
+      sectionMap.appendChild(offer);
+    }
+  } else if (ev.target.classList.contains('popup__close')) {
+    sectionMap.removeChild(mapCardPopup);
+  }
+};
+/** по клюку на метку отрисовываю все метки */
+document.addEventListener('click', labelsHandler);
+var labelRendering = function (dis) {
+  /** прячу все элименты ! метки и табличку с описаниями */
+  /** labelRendering - отрисовка метки */
+  for (var i = 0; i < mapFaded.children.length; i++) {
+    if (mapFaded.children[i].classList.contains('map__pin')) {
+      mapFaded.children[i].style.display = dis;
+    }
+    if (mapFaded.children[i].classList.contains('map__pin--main')) {
+      mapFaded.children[i].style.display = 'inline-block';
+    }
+  }
+};
+/** отключение полей формы .notice__form */
+var noticesForm = document.querySelector('.notice__form');
+var formsDisabled = function (flag) {
+  /** добовляю в поля формы disabled */
+  for (var i = 0; i < noticesForm.length; i++) {
+    noticesForm[i].disabled = flag;
+  }
+};
+/** обертка запускаю при закрузки document*/
+var formsDisabledHandler = function () {
+  formsDisabled(true);
+  labelRendering('none');
+};
+/** для перетаскивание элимента */
+var mapPinMapHandler = document.querySelector('.map__pin--main');
+/** input для записи адреса */
+var inputAdress = noticesForm.querySelector('#address');
+/** обьект с координатами */
+var objCoordinators = mapPinMapHandler.getBoundingClientRect();
+var activetInputNavigator = function () {
+  /** записываю координаты адреса в input */
+  inputAdress.value = 'A ' + 'objX = ' + (objCoordinators.x - (objCoordinators.width / 2)) + ' objY = '
+    + (objCoordinators.y - (objCoordinators.height / 2) + ' top ' + (objCoordinators.top + 22));
+};
+var notActiveInputNavigator = function () {
+  inputAdress.value = 'N ' + 'objX = ' + (objCoordinators.x - (objCoordinators.width / 2)) + ' objY = '
+    + (objCoordinators.y - (objCoordinators.height / 2) + ' top ' + (objCoordinators.top + 22));
+};
+document.addEventListener('DOMContentLoaded', formsDisabledHandler);
+mapPinMapHandler.addEventListener('mouseup', function () {
+  /** появление метоки на карте */
+  sectionMap.classList.remove('map--faded');
+  /** отменяет disabled */
+  noticesForm.classList.remove('notice__form--disabled');
+  formsDisabled(false);
+  /** запись адриса */
+  activetInputNavigator();
+  labelRendering('inline-block');
+});
+/** запись адриса при заблокированой форме */
+notActiveInputNavigator(mapPinMapHandler);
