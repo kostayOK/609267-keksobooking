@@ -99,7 +99,7 @@ var renderMap = function (mapFaded, data) {
   /** mapFaded - куда | data - массив */
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < data.length; i++) {
-    fragment.appendChild(createPin(data[i], data.indexOf(data[i])));
+    fragment.appendChild(createPin(data[i], i));
   }
   mapFaded.appendChild(fragment);
 };
@@ -164,12 +164,12 @@ var labelsHandler = function (ev) {
 };
 /** по клюку на метку отрисовываю все метки */
 document.addEventListener('click', labelsHandler);
-var labelRendering = function (dis) {
+var setPinsDisplay = function (display) {
   /** прячу все элименты ! метки и табличку с описаниями */
-  /** labelRendering - отрисовка метки */
+  /** setPinsDisplay - отрисовка метки */
   for (var i = 0; i < mapFaded.children.length; i++) {
     if (mapFaded.children[i].classList.contains('map__pin')) {
-      mapFaded.children[i].style.display = dis;
+      mapFaded.children[i].style.display = display;
     }
     if (mapFaded.children[i].classList.contains('map__pin--main')) {
       mapFaded.children[i].style.display = 'inline-block';
@@ -187,7 +187,7 @@ var setFormsDisabled = function (flag) {
 /** обертка запускаю при закрузки document*/
 var formsDisabledHandler = function () {
   setFormsDisabled(true);
-  labelRendering('none');
+  setPinsDisplay('none');
 };
 /** для перетаскивание элимента */
 var mapPinMap = document.querySelector('.map__pin--main');
@@ -197,8 +197,7 @@ var inputAddress = noticesForm.querySelector('#address');
 var rect = mapPinMap.getBoundingClientRect();
 var inputNavigator = function () {
   /** запись адриса при заблокированой форме */
-  inputAddress.value = 'N ' + 'objX = ' + (rect.x - (rect.width / 2)) + ' objY = '
-    + (rect.y - (rect.height / 2) + ' top ' + (rect.top + 22));
+  inputAddress.value = (rect.x - (rect.width / 2)) + ' / ' + (rect.y - (rect.height / 2));
 };
 document.addEventListener('DOMContentLoaded', formsDisabledHandler);
 mapPinMap.addEventListener('mouseup', function () {
@@ -208,6 +207,6 @@ mapPinMap.addEventListener('mouseup', function () {
   noticesForm.classList.remove('notice__form--disabled');
   setFormsDisabled(false);
   /** запись адриса */
-  labelRendering('inline-block');
+  setPinsDisplay('inline-block');
 });
 inputNavigator(mapPinMap);
