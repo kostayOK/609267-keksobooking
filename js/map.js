@@ -151,15 +151,25 @@ var labelsHandler = function (ev) {
   if (mapCardPopup) {
     sectionMap.removeChild(mapCardPopup);
   }
+  var universallyPikPin = function (childrenYes) {
+    /** смотрю по нажатие кнопки */
+    var offer;
+    if (childrenYes) {
+      offer = createOffer(arrObj[ev.target.children[0].dataset.indexPin]);
+      sectionMap.appendChild(offer);
+    } else {
+      offer = createOffer(arrObj[ev.target.dataset.indexPin]);
+      sectionMap.appendChild(offer);
+    }
+  };
   /** записываю обьект по индексу из data */
   /** если есть обьект dataset то добовляю окно инфы */
-  if (ev.target.dataset.indexPin) {
-    var offer = createOffer(arrObj[ev.target.dataset.indexPin]);
-    sectionMap.appendChild(offer);
-    /** по клику удаляю окно с описанием */
-    if (ev.target.classList.contains('popup__close')) {
-      sectionMap.removeChild(mapCardPopup);
+  if (ev.target.tagName === 'BUTTON' && ev.target.classList.contains('map__pin')) {
+    if (ev.target.children[0].dataset.indexPin) {
+      universallyPikPin(true);
     }
+  } else if (ev.target.dataset.indexPin) {
+    universallyPikPin();
   }
 };
 /** по клюку на метку отрисовываю все метки */
