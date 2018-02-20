@@ -58,7 +58,7 @@ var generateData = function () {
   }
   return arr;
 };
-var createPin = function (obj, ind) {
+var createPin = function (obj, index) {
   /** createPin - создаем дом элимент метка */
   /** отрисовка дом элимента button и добовление фотографии */
   var buttonLocation = document.createElement('button');
@@ -74,9 +74,8 @@ var createPin = function (obj, ind) {
   imgButton.src = obj.author.avatar;
   buttonLocation.appendChild(imgButton);
   /** создаю data атрибут чтобы по ниму вычеслять */
-  var dataS = imgButton.dataset;
   /** записываю индекс по индексу в масиве */
-  dataS.indexPin = ind;
+  imgButton.dataset.indexPin = index;
   return buttonLocation;
 };
 /** удаление класса сказано времменое решение */
@@ -149,19 +148,18 @@ var labelsHandler = function (ev) {
   /** поклюку на метку отрисоввываю предложение и удаляю */
   /** складываю элименты для отрисовки в dom */
   var mapCardPopup = sectionMap.querySelector('article.map__card');
-  if (ev.target.dataset) {
-    if (mapCardPopup) {
+  if (mapCardPopup) {
+    sectionMap.removeChild(mapCardPopup);
+  }
+  /** записываю обьект по индексу из data */
+  /** если есть обьект dataset то добовляю окно инфы */
+  if (ev.target.dataset.indexPin) {
+    var offer = createOffer(arrObj[ev.target.dataset.indexPin]);
+    sectionMap.appendChild(offer);
+    /** по клику удаляю окно с описанием */
+    if (ev.target.classList.contains('popup__close')) {
       sectionMap.removeChild(mapCardPopup);
     }
-    /** записываю обьект по индексу из data */
-    /** если есть обьект dataset то добовляю окно инфы */
-    if (ev.target.dataset.indexPin) {
-      var offer = createOffer(arrObj[ev.target.dataset.indexPin]);
-      sectionMap.appendChild(offer);
-    }
-    /** по клику удаляю окно с описанием */
-  } else if (ev.target.classList.contains('popup__close')) {
-    sectionMap.removeChild(mapCardPopup);
   }
 };
 /** по клюку на метку отрисовываю все метки */
@@ -180,7 +178,7 @@ var labelRendering = function (dis) {
 };
 /** отключение полей формы .notice__form */
 var noticesForm = document.querySelector('.notice__form');
-var formsDisabled = function (flag) {
+var setFormsDisabled = function (flag) {
   /** добовляю в поля формы disabled */
   for (var i = 0; i < noticesForm.length; i++) {
     noticesForm[i].disabled = flag;
@@ -188,34 +186,28 @@ var formsDisabled = function (flag) {
 };
 /** обертка запускаю при закрузки document*/
 var formsDisabledHandler = function () {
-  formsDisabled(true);
+  setFormsDisabled(true);
   labelRendering('none');
 };
 /** для перетаскивание элимента */
-var mapPinMapHandler = document.querySelector('.map__pin--main');
+var mapPinMap = document.querySelector('.map__pin--main');
 /** input для записи адреса */
-var inputAdress = noticesForm.querySelector('#address');
+var inputAddress = noticesForm.querySelector('#address');
 /** обьект с координатами */
-var objCoordinators = mapPinMapHandler.getBoundingClientRect();
-var activetInputNavigator = function () {
-  /** записываю координаты адреса в input */
-  inputAdress.value = 'A ' + 'objX = ' + (objCoordinators.x - (objCoordinators.width / 2)) + ' objY = '
-    + (objCoordinators.y - (objCoordinators.height / 2) + ' top ' + (objCoordinators.top + 22));
-};
-var notActiveInputNavigator = function () {
-  inputAdress.value = 'N ' + 'objX = ' + (objCoordinators.x - (objCoordinators.width / 2)) + ' objY = '
-    + (objCoordinators.y - (objCoordinators.height / 2) + ' top ' + (objCoordinators.top + 22));
+var rect = mapPinMap.getBoundingClientRect();
+var inputNavigator = function () {
+  /** запись адриса при заблокированой форме */
+  inputAddress.value = 'N ' + 'objX = ' + (rect.x - (rect.width / 2)) + ' objY = '
+    + (rect.y - (rect.height / 2) + ' top ' + (rect.top + 22));
 };
 document.addEventListener('DOMContentLoaded', formsDisabledHandler);
-mapPinMapHandler.addEventListener('mouseup', function () {
+mapPinMap.addEventListener('mouseup', function () {
   /** появление метоки на карте */
   sectionMap.classList.remove('map--faded');
   /** отменяет disabled */
   noticesForm.classList.remove('notice__form--disabled');
-  formsDisabled(false);
+  setFormsDisabled(false);
   /** запись адриса */
-  activetInputNavigator();
   labelRendering('inline-block');
 });
-/** запись адриса при заблокированой форме */
-notActiveInputNavigator(mapPinMapHandler);
+inputNavigator(mapPinMap);
