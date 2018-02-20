@@ -58,7 +58,7 @@ var generateData = function () {
   }
   return arr;
 };
-var createPin = function (obj) {
+var createPin = function (obj, ind) {
   /** createPin - создаем дом элимент метка */
   /** отрисовка дом элимента button и добовление фотографии */
   var buttonLocation = document.createElement('button');
@@ -73,6 +73,10 @@ var createPin = function (obj) {
   imgButton.style.height = '40' + 'px';
   imgButton.src = obj.author.avatar;
   buttonLocation.appendChild(imgButton);
+  /** создаю data атрибут чтобы по ниму вычеслять */
+  var dataS = imgButton.dataset;
+  /** записываю индекс по индексу в масиве */
+  dataS.indexPin = ind;
   return buttonLocation;
 };
 /** удаление класса сказано времменое решение */
@@ -96,7 +100,7 @@ var renderMap = function (mapFaded, data) {
   /** mapFaded - куда | data - массив */
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < data.length; i++) {
-    fragment.appendChild(createPin(data[i]));
+    fragment.appendChild(createPin(data[i], data.indexOf(data[i])));
   }
   mapFaded.appendChild(fragment);
 };
@@ -121,6 +125,7 @@ var createOffer = function (data) {
   var popupFeatures = laying.querySelector('.popup__features');
   /** обход по ul его ли */
   for (var i = 0; i < popupFeatures.children.length; i++) {
+    /** прячу услуги парковка и т.д */
     popupFeatures.children[i].style.display = 'none';
     var arr = data.offer.features;
     /** обход по мосиву моке */
@@ -128,6 +133,7 @@ var createOffer = function (data) {
       var ind = popupFeatures.children[i].classList[1].replace('feature--', '');
       var elCls = arr.indexOf(ind) !== -1;
       if (elCls) {
+        /** показываю услуги парковка и т.д */
         popupFeatures.children[i].style.display = 'inline-block';
       }
     }
@@ -143,15 +149,17 @@ var labelsHandler = function (ev) {
   /** поклюку на метку отрисоввываю предложение и удаляю */
   /** складываю элименты для отрисовки в dom */
   var mapCardPopup = sectionMap.querySelector('article.map__card');
-  if (ev.target.tagName === 'IMG') {
+  if (ev.target.dataset) {
     if (mapCardPopup) {
       sectionMap.removeChild(mapCardPopup);
     }
-    var prock = arrImgUrls.indexOf(ev.target.currentSrc.replace(window.location.origin + '/609267-keksobooking/', ''));
-    if (prock !== -1) {
-      var offer = createOffer(arrObj[prock]);
+    /** записываю обьект по индексу из data */
+    /** если есть обьект dataset то добовляю окно инфы */
+    if (ev.target.dataset.indexPin) {
+      var offer = createOffer(arrObj[ev.target.dataset.indexPin]);
       sectionMap.appendChild(offer);
     }
+    /** по клику удаляю окно с описанием */
   } else if (ev.target.classList.contains('popup__close')) {
     sectionMap.removeChild(mapCardPopup);
   }
