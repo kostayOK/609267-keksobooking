@@ -22,9 +22,6 @@ var timeCheckin = ['12:00', '13:00', '14:00'];
 var timeDeparture = ['12:00', '13:00', '14:00'];
 /** особености жилья */
 var featuresHousing = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-// var featuresHousingRandom = featuresHousing.splice(0, numberRandom(0, featuresHousing.length));
-
-// console.log(featuresHousing.splice(0, numberRandom(0, featuresHousing.length)));
 /** масив фотографий */
 var arrPhotos = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -61,7 +58,7 @@ var generateData = function () {
   }
   return arr;
 };
-var createPin = function (obj) {
+var createPin = function (obj, index) {
   /** createPin - создаем дом элимент метка */
   /** отрисовка дом элимента button и добовление фотографии */
   var buttonLocation = document.createElement('button');
@@ -76,11 +73,13 @@ var createPin = function (obj) {
   imgButton.style.height = '40' + 'px';
   imgButton.src = obj.author.avatar;
   buttonLocation.appendChild(imgButton);
+  /** создаю data атрибут чтобы по ниму вычеслять */
+  /** записываю индекс по индексу в масиве */
+  imgButton.dataset.indexPin = index;
   return buttonLocation;
 };
 /** удаление класса сказано времменое решение */
 var sectionMap = document.querySelector('.map');
-sectionMap.classList.remove('map--faded');
 /** описание template ! внутринасти для размищения и замены */
 var descriptionTemplate = document.querySelector('template').content.querySelector('article.map__card');
 var choiceTypeHousing = function (arr) {
@@ -100,7 +99,7 @@ var renderMap = function (mapFaded, data) {
   /** mapFaded - куда | data - массив */
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < data.length; i++) {
-    fragment.appendChild(createPin(data[i]));
+    fragment.appendChild(createPin(data[i], i));
   }
   mapFaded.appendChild(fragment);
 };
@@ -125,6 +124,7 @@ var createOffer = function (data) {
   var popupFeatures = laying.querySelector('.popup__features');
   /** обход по ul его ли */
   for (var i = 0; i < popupFeatures.children.length; i++) {
+    /** прячу услуги парковка и т.д */
     popupFeatures.children[i].style.display = 'none';
     var arr = data.offer.features;
     /** обход по мосиву моке */
@@ -132,6 +132,7 @@ var createOffer = function (data) {
       var ind = popupFeatures.children[i].classList[1].replace('feature--', '');
       var elCls = arr.indexOf(ind) !== -1;
       if (elCls) {
+        /** показываю услуги парковка и т.д */
         popupFeatures.children[i].style.display = 'inline-block';
       }
     }
@@ -143,5 +144,71 @@ var createOffer = function (data) {
 var mapFaded = document.querySelector('.map__pins');
 var arrObj = generateData();
 renderMap(mapFaded, arrObj);
-var offer = createOffer(arrObj[2]);
-sectionMap.appendChild(offer);
+var labelsHandler = function (ev) {
+  /** поклюку на метку отрисоввываю предложение и удаляю */
+  /** складываю элименты для отрисовки в dom */
+  var mapCardPopup = sectionMap.querySelector('article.map__card');
+  if (mapCardPopup) {
+    sectionMap.removeChild(mapCardPopup);
+  }
+  /** записываю обьект по индексу из data */
+  /** если есть обьект dataset то добовляю окно инфы */
+  var index;
+  if (ev.target.classList.contains('map__pin')) {
+    index = ev.target.children[0].dataset.indexPin;
+  } else {
+    index = ev.target.dataset.indexPin;
+  } /** нужна такая магия, потому что если мы напишем просто if(index), то это не сработает для index === 0 */
+  if (typeof index !== 'undefined') {
+
+    sectionMap.appendChild(createOffer(arrObj[index]));
+  }
+};
+/** по клюку на метку отрисовываю все метки */
+document.addEventListener('click', labelsHandler);
+var setPinsDisplay = function (display) {
+  /** прячу все элименты ! метки и табличку с описаниями */
+  /** setPinsDisplay - отрисовка метки */
+  for (var i = 0; i < mapFaded.children.length; i++) {
+    if (mapFaded.children[i].classList.contains('map__pin')) {
+      mapFaded.children[i].style.display = display;
+    }
+    if (mapFaded.children[i].classList.contains('map__pin--main')) {
+      mapFaded.children[i].style.display = 'inline-block';
+    }
+  }
+};
+/** отключение полей формы .notice__form */
+var noticesForm = document.querySelector('.notice__form');
+var setFormsDisabled = function (flag) {
+  /** добовляю в поля формы disabled */
+  for (var i = 0; i < noticesForm.length; i++) {
+    noticesForm[i].disabled = flag;
+  }
+};
+/** обертка запускаю при закрузки document*/
+var formsDisabledHandler = function () {
+  setFormsDisabled(true);
+  setPinsDisplay('none');
+};
+/** для перетаскивание элимента */
+var mapPinMap = document.querySelector('.map__pin--main');
+/** input для записи адреса */
+var inputAddress = noticesForm.querySelector('#address');
+/** обьект с координатами */
+var rect = mapPinMap.getBoundingClientRect();
+var inputNavigator = function () {
+  /** запись адриса при заблокированой форме */
+  inputAddress.value = (rect.x - (rect.width / 2)) + ',' + (rect.y - (rect.height / 2));
+};
+document.addEventListener('DOMContentLoaded', formsDisabledHandler);
+mapPinMap.addEventListener('mouseup', function () {
+  /** появление метоки на карте */
+  sectionMap.classList.remove('map--faded');
+  /** отменяет disabled */
+  noticesForm.classList.remove('notice__form--disabled');
+  setFormsDisabled(false);
+  /** запись адриса */
+  setPinsDisplay('inline-block');
+});
+inputNavigator(mapPinMap);
