@@ -151,25 +151,17 @@ var labelsHandler = function (ev) {
   if (mapCardPopup) {
     sectionMap.removeChild(mapCardPopup);
   }
-  var universallyPikPin = function (childrenYes) {
-    /** смотрю по нажатие кнопки */
-    var offer;
-    if (childrenYes) {
-      offer = createOffer(arrObj[ev.target.children[0].dataset.indexPin]);
-      sectionMap.appendChild(offer);
-    } else {
-      offer = createOffer(arrObj[ev.target.dataset.indexPin]);
-      sectionMap.appendChild(offer);
-    }
-  };
   /** записываю обьект по индексу из data */
   /** если есть обьект dataset то добовляю окно инфы */
-  if (ev.target.tagName === 'BUTTON' && ev.target.classList.contains('map__pin')) {
-    if (ev.target.children[0].dataset.indexPin) {
-      universallyPikPin(true);
-    }
-  } else if (ev.target.dataset.indexPin) {
-    universallyPikPin();
+  var index;
+  if (ev.target.classList.contains('map__pin')) {
+    index = ev.target.children[0].dataset.indexPin;
+  } else {
+    index = ev.target.dataset.indexPin;
+  } /** нужна такая магия, потому что если мы напишем просто if(index), то это не сработает для index === 0 */
+  if (typeof index !== 'undefined') {
+
+    sectionMap.appendChild(createOffer(arrObj[index]));
   }
 };
 /** по клюку на метку отрисовываю все метки */
@@ -207,7 +199,7 @@ var inputAddress = noticesForm.querySelector('#address');
 var rect = mapPinMap.getBoundingClientRect();
 var inputNavigator = function () {
   /** запись адриса при заблокированой форме */
-  inputAddress.value = (rect.x - (rect.width / 2)) + ' / ' + (rect.y - (rect.height / 2));
+  inputAddress.value = (rect.x - (rect.width / 2)) + ',' + (rect.y - (rect.height / 2));
 };
 document.addEventListener('DOMContentLoaded', formsDisabledHandler);
 mapPinMap.addEventListener('mouseup', function () {
