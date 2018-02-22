@@ -206,7 +206,7 @@ mapPinMap.addEventListener('mouseup', function () {
   /** отменяет disabled */
   noticesForm.classList.remove('notice__form--disabled');
   setFormsDisabled(false);
-  /** запись адриса */
+  /** запись адриса. */
   setPinsDisplay('inline-block');
 });
 inputNavigator(mapPinMap);
