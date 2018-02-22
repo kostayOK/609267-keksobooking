@@ -153,13 +153,16 @@ var labelsHandler = function (ev) {
   }
   /** записываю обьект по индексу из data */
   /** если есть обьект dataset то добовляю окно инфы */
-  if (ev.target.dataset.indexPin) {
-    var offer = createOffer(arrObj[ev.target.dataset.indexPin]);
-    sectionMap.appendChild(offer);
-    /** по клику удаляю окно с описанием */
-    if (ev.target.classList.contains('popup__close')) {
-      sectionMap.removeChild(mapCardPopup);
-    }
+  var index;
+  if (ev.target.classList.contains('map__pin')) {
+    index = ev.target.children[0].dataset.indexPin;
+  } else {
+    index = ev.target.dataset.indexPin;
+  }
+  /** нужна такая магия, потому что если мы напишем просто if(index), то это не сработает для index === 0 */
+  if (typeof index !== 'undefined') {
+
+    sectionMap.appendChild(createOffer(arrObj[index]));
   }
 };
 /** по клюку на метку отрисовываю все метки */
@@ -179,7 +182,7 @@ var setPinsDisplay = function (display) {
 /** отключение полей формы .notice__form */
 var noticesForm = document.querySelector('.notice__form');
 var setFormsDisabled = function (flag) {
-  /** добовляю в поля формы disabled */
+  /** добовляю  формы disabled или убераю */
   for (var i = 0; i < noticesForm.length; i++) {
     noticesForm[i].disabled = flag;
   }
@@ -197,7 +200,7 @@ var inputAddress = noticesForm.querySelector('#address');
 var rect = mapPinMap.getBoundingClientRect();
 var inputNavigator = function () {
   /** запись адриса при заблокированой форме */
-  inputAddress.value = (rect.x - (rect.width / 2)) + ' / ' + (rect.y - (rect.height / 2));
+  inputAddress.value = (rect.x - (rect.width / 2)) + ',' + (rect.y - (rect.height / 2));
 };
 document.addEventListener('DOMContentLoaded', formsDisabledHandler);
 mapPinMap.addEventListener('mouseup', function () {
@@ -206,7 +209,110 @@ mapPinMap.addEventListener('mouseup', function () {
   /** отменяет disabled */
   noticesForm.classList.remove('notice__form--disabled');
   setFormsDisabled(false);
-  /** запись адриса. */
+  /** запись адриса */
   setPinsDisplay('inline-block');
+  /** добовляю в поля формы disabled */
+  var address = noticesForm.querySelector('input[name=address]');
+  address.disabled = true;
 });
 inputNavigator(mapPinMap);
+/** notice__form notice__form--disabled */
+/** после нажатия переходим в неоктивный режим */
+var formReset = noticesForm.querySelector('.form__reset');
+formReset.addEventListener('mouseup', function () {
+  /** пререзагрузил страницу */
+  location.reload();
+});
+var price = noticesForm.querySelector('#price');
+var typeSelect = noticesForm.querySelector('#type');
+var controlHandler = function () {
+  /** добовляю тип жилья и цена должна соответствовать */
+  if (typeSelect.children[0].value === 'flat' && typeSelect.children[0].selected) {
+    price.min = 1000;
+  } else if (typeSelect.children[1].value === 'bungalo' && typeSelect.children[1].selected) {
+    price.min = 0;
+  } else if (typeSelect.children[2].value === 'house' && typeSelect.children[2].selected) {
+    price.min = 5000;
+  } else if (typeSelect.children[3].value === 'palace' && typeSelect.children[3].selected) {
+    price.min = 10000;
+  }
+};
+/** происходит по окончании изменения значения элемента формы тип жилья цена за ночь */
+typeSelect.addEventListener('change', controlHandler);
+price.addEventListener('change', controlHandler);
+var timein = noticesForm.querySelector('#timein');
+var timeout = noticesForm.querySelector('#timeout');
+var timeInOunHendler = function (selectStart, selectEnd) {
+  /** выстовляю значение время заезда и выезда */
+  for (var i = 0; i < selectStart.children.length; i++) {
+    selectEnd.children[i].disabled = true;
+    if (selectStart.children[i].selected) {
+      selectEnd.children[i].disabled = false;
+      selectEnd.children[i].selected = true;
+    }
+  }
+};
+timein.addEventListener('change', function () {
+  /** выстовляю значение время заезда и выезда */
+  timeInOunHendler(timein, timeout);
+});
+
+timeout.addEventListener('change', function () {
+  /** выстовляю значение время заезда и выезда */
+  timeInOunHendler(timeout, timein);
+});
+/** размищение гостей */
+var roomNumber = noticesForm.querySelector('#room_number');
+var capacity = noticesForm.querySelector('#capacity');
+var conditionLock = function (one) {
+  /** вычисляю каким полям задовать disabled по умолчанию сначало у всех стоит true */
+  for (var i = 0; i < capacity.children.length; i++) {
+    capacity.children[i].disabled = true;
+    if (one === i) {
+      if (i === 2) {
+        capacity.children[i].disabled = false;
+        capacity.children[i].selected = i;
+      } else if (i === 0) {
+        capacity.children[i].selected = i;
+        capacity.children[i].disabled = false;
+        i++;
+        capacity.children[i].disabled = false;
+        i++;
+        capacity.children[i].disabled = false;
+      } else if (i === 1) {
+        capacity.children[i].selected = i;
+        capacity.children[i].disabled = false;
+        i++;
+        capacity.children[i].disabled = false;
+      } else if (i === 3) {
+        capacity.children[i].selected = i;
+        capacity.children[i].disabled = false;
+      }
+
+    }
+  }
+};
+var roomNumberCapacity = function () {
+  /** окончания вычисления сколько комнат ! разрешить кол-во жилцов */
+  for (var i = 0; i < roomNumber.children.length; i++) {
+    var selectValue = roomNumber.children[i].value;
+    if (roomNumber.children[i].selected) {
+      switch (selectValue) {
+        case '1':
+          conditionLock(2);
+          break;
+        case '2':
+          conditionLock(1);
+          break;
+        case '3':
+          conditionLock(0);
+          break;
+        case '100':
+          conditionLock(3);
+          break;
+      }
+    }
+  }
+};
+roomNumber.addEventListener('change', roomNumberCapacity);
+document.addEventListener('DOMContentLoaded', roomNumberCapacity);
