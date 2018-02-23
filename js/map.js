@@ -227,14 +227,20 @@ var price = noticesForm.querySelector('#price');
 var typeSelect = noticesForm.querySelector('#type');
 var controlHandler = function () {
   /** добовляю тип жилья и цена должна соответствовать */
-  if (typeSelect.children[0].value === 'flat' && typeSelect.children[0].selected) {
-    price.min = 1000;
-  } else if (typeSelect.children[1].value === 'bungalo' && typeSelect.children[1].selected) {
-    price.min = 0;
-  } else if (typeSelect.children[2].value === 'house' && typeSelect.children[2].selected) {
-    price.min = 5000;
-  } else if (typeSelect.children[3].value === 'palace' && typeSelect.children[3].selected) {
-    price.min = 10000;
+  var value = typeSelect.value;
+  switch (value) {
+    case 'flat':
+      price.min = 1000;
+      break;
+    case 'bungalo':
+      price.min = 0;
+      break;
+    case 'house':
+      price.min = 5000;
+      break;
+    case 'palace':
+      price.min = 10000;
+      break;
   }
 };
 /** происходит по окончании изменения значения элемента формы тип жилья цена за ночь */
@@ -245,9 +251,7 @@ var timeout = noticesForm.querySelector('#timeout');
 var timeInOunHendler = function (selectStart, selectEnd) {
   /** выстовляю значение время заезда и выезда */
   for (var i = 0; i < selectStart.children.length; i++) {
-    selectEnd.children[i].disabled = true;
     if (selectStart.children[i].selected) {
-      selectEnd.children[i].disabled = false;
       selectEnd.children[i].selected = true;
     }
   }
@@ -264,55 +268,39 @@ timeout.addEventListener('change', function () {
 /** размищение гостей */
 var roomNumber = noticesForm.querySelector('#room_number');
 var capacity = noticesForm.querySelector('#capacity');
-var conditionLock = function (one) {
-  /** вычисляю каким полям задовать disabled по умолчанию сначало у всех стоит true */
-  for (var i = 0; i < capacity.children.length; i++) {
-    capacity.children[i].disabled = true;
-    if (one === i) {
-      if (i === 2) {
-        capacity.children[i].disabled = false;
-        capacity.children[i].selected = i;
-      } else if (i === 0) {
-        capacity.children[i].selected = i;
-        capacity.children[i].disabled = false;
-        i++;
-        capacity.children[i].disabled = false;
-        i++;
-        capacity.children[i].disabled = false;
-      } else if (i === 1) {
-        capacity.children[i].selected = i;
-        capacity.children[i].disabled = false;
-        i++;
-        capacity.children[i].disabled = false;
-      } else if (i === 3) {
-        capacity.children[i].selected = i;
-        capacity.children[i].disabled = false;
-      }
-
-    }
-  }
-};
 var roomNumberCapacity = function () {
   /** окончания вычисления сколько комнат ! разрешить кол-во жилцов */
-  for (var i = 0; i < roomNumber.children.length; i++) {
-    var selectValue = roomNumber.children[i].value;
-    if (roomNumber.children[i].selected) {
-      switch (selectValue) {
-        case '1':
-          conditionLock(2);
-          break;
-        case '2':
-          conditionLock(1);
-          break;
-        case '3':
-          conditionLock(0);
-          break;
-        case '100':
-          conditionLock(3);
-          break;
-      }
-    }
+  var value = roomNumber.value;
+  var capacityChildren = capacity.children;
+  for (var i = 0; i < capacityChildren.length; i++) {
+    /** disabled по умолчанию сначало у всех стоит true */
+    capacityChildren[i].disabled = true;
   }
+  var THRE_PERSON = 0;
+  var TWO_PERSON = 1;
+  var ONE_PERSON = 2;
+  var NOT_PERSON = 3;
+  capacityChildren[ONE_PERSON].selected = true;
+  switch (value) {
+    case '1':
+      capacityChildren[ONE_PERSON].disabled = false;
+      break;
+    case '2':
+      capacityChildren[TWO_PERSON].disabled = false;
+      capacityChildren[ONE_PERSON].disabled = false;
+      break;
+    case '3':
+      capacityChildren[THRE_PERSON].disabled = false;
+      capacityChildren[TWO_PERSON].disabled = false;
+      capacityChildren[ONE_PERSON].disabled = false;
+      break;
+    case '100':
+      capacityChildren[NOT_PERSON].disabled = false;
+      capacityChildren[NOT_PERSON].selected = true;
+      break;
+  }
+
+
 };
 roomNumber.addEventListener('change', roomNumberCapacity);
 document.addEventListener('DOMContentLoaded', roomNumberCapacity);
