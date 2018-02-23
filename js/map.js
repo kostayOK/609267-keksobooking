@@ -161,7 +161,6 @@ var labelsHandler = function (ev) {
   }
   /** нужна такая магия, потому что если мы напишем просто if(index), то это не сработает для index === 0 */
   if (typeof index !== 'undefined') {
-
     sectionMap.appendChild(createOffer(arrObj[index]));
   }
 };
