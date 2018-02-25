@@ -49,7 +49,7 @@
     setPinsDisplay('inline-block');
     /** добовляю в поля формы disabled */
     var address = noticesForm.querySelector('input[name=address]');
-    address.disabled = true;
+    address.readOnly = true;
     var formReset = noticesForm.querySelector('.form__reset');
     /** перезагрузил страницу при очистке формы */
     formReset.addEventListener('mouseup', function () {
