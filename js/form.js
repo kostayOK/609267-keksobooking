@@ -49,12 +49,13 @@
     setPinsDisplay('inline-block');
     /** добовляю в поля формы disabled */
     var address = noticesForm.querySelector('input[name=address]');
-    address.disabled = true;
+    address.readonly = true;
     var formReset = noticesForm.querySelector('.form__reset');
     /** перезагрузил страницу при очистке формы */
     formReset.addEventListener('mouseup', function () {
       location.reload();
     });
+    mapPinMap.addEventListener('mousedown', window.onMouseDown);
   });
 
   var price = noticesForm.querySelector('#price');
