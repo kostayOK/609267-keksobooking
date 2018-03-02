@@ -55,6 +55,7 @@
     formReset.addEventListener('mouseup', function () {
       location.reload();
     });
+    mapPinMap.addEventListener('mousedown', window.onMouseDown);
   });
 
   var price = noticesForm.querySelector('#price');
