@@ -10,9 +10,10 @@
     /** начальные координаты мыши */
     var shiftX = e.pageX;
     var shiftY = e.pageY;
+    var mapPins = document.querySelector('.map__pins');
 
-    function moveAt(evt) {
-      /** записываю координаты */
+    function onMouseMove(evt) {
+      /** записываю координаты 3, перемещать по экрану */
       /** отнять текущии координаты мыши с начальные координаты мыши */
       var resultLeft = evt.pageX - shiftX;
       var resultTop = evt.pageY - shiftY;
@@ -20,20 +21,15 @@
       ball.style.left = parseInt(startLeft, 10) + resultLeft + 'px';
       ball.style.top = parseInt(startTop, 10) + resultTop + 'px';
     }
-
-    // 3, перемещать по экрану
-    var onMouseMove = function (ev) {
-      moveAt(ev);
-    };
-    document.querySelector('.map__pinsoverlay').addEventListener('mousemove', onMouseMove);
+    mapPins.addEventListener('mousemove', onMouseMove);
     // 4. отследить окончание переноса
     var onMouseUp = function () {
       var form = document.querySelector('input[name=address]');
       /** записываю координаты в input */
-      var result = ball.style.left + ',' + ball.style.top;
+      var result = parseInt(ball.style.left, 10) + ',' + parseInt(ball.style.top, 10);
       var address = result;
       form.value = address;
-      document.querySelector('.map__pinsoverlay').removeEventListener('mousemove', onMouseMove);
+      mapPins.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
     document.addEventListener('mouseup', onMouseUp);
