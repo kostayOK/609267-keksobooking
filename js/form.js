@@ -1,61 +1,81 @@
 'use strict';
 (function () {
   var sectionMap = document.querySelector('.map');
-  var mapFaded = document.querySelector('.map__pins');
-  var setPinsDisplay = function (display) {
+  var pinsContainer = document.querySelector('.map__pins');
+  /** для перетаскивание элимента */
+  var mapPinMain = document.querySelector('.map__pin--main');
+  /** input для записи адреса */
+  var noticesForm = document.querySelector('.notice__form');
+  var inputAddress = noticesForm.querySelector('#address');
+  inputAddress.readOnly = true;
+  var formReset = noticesForm.querySelector('.form__reset');
+  formReset.addEventListener('mouseup', function () {
+    noticesForm.reset();
+  });
+  mapPinMain.addEventListener('mousedown', window.onMouseDown);
+
+  window.setPinsDisplay = function (display) {
     /** прячу все элименты ! метки и табличку с описаниями */
     /** setPinsDisplay - отрисовка метки */
-    for (var i = 0; i < mapFaded.children.length; i++) {
-      if (mapFaded.children[i].classList.contains('map__pin')) {
-        mapFaded.children[i].style.display = display;
+    for (var i = 0; i < pinsContainer.children.length; i++) {
+      if (pinsContainer.children[i].classList.contains('map__pin')) {
+        pinsContainer.children[i].style.display = display;
       }
-      if (mapFaded.children[i].classList.contains('map__pin--main')) {
-        mapFaded.children[i].style.display = 'inline-block';
+      if (pinsContainer.children[i].classList.contains('map__pin--main')) {
+        pinsContainer.children[i].style.display = 'inline-block';
       }
     }
   };
-  /** отключение полей формы .notice__form */
-  var noticesForm = document.querySelector('.notice__form');
   var setFormsDisabled = function (flag) {
+    /** отключение полей формы .notice__form */
     /** добовляю в поля формы disabled */
     for (var i = 0; i < noticesForm.length; i++) {
       noticesForm[i].disabled = flag;
     }
   };
+
   /** обертка запускаю при закрузки document*/
   var formsDisabledHandler = function () {
     setFormsDisabled(true);
-    setPinsDisplay('none');
   };
-  /** для перетаскивание элимента */
-  var mapPinMap = document.querySelector('.map__pin--main');
-  /** input для записи адреса */
-  var inputAddress = noticesForm.querySelector('#address');
+  window.addEventListener('load', formsDisabledHandler);
+
   /** обьект с координатами */
-  var rect = mapPinMap.getBoundingClientRect();
-  var inputNavigator = function () {
+  var rect = mapPinMain.getBoundingClientRect();
+
+  var setDefaultAddress = function () {
     /** запись адриса при заблокированой форме */
     inputAddress.value = (rect.x - (rect.width / 2)) + ',' + (rect.y - (rect.height / 2));
   };
-  inputNavigator();
-  document.addEventListener('DOMContentLoaded', formsDisabledHandler);
-  mapPinMap.addEventListener('mouseup', function () {
+  setDefaultAddress();
+  var errors = document.querySelector('.errors');
+  var onSubmitError = function (message) {
+    errors.textContent = message;
+  };
+  var onSubmitSuccess = function () {
+    noticesForm.reset();
+    window.setPinsDisplay('none');
+    setDefaultAddress();
+    sectionMap.classList.add('map--faded');
+    noticesForm.classList.add('notice__form--disabled');
+    setFormsDisabled(true);
+    window.setPinsDisplay('none');
+    mapPinMain.style.left = mapPinMain.style.top = '';
+  };
+
+  noticesForm.addEventListener('submit', function (evt) {
+    window.backend.upload('https://js.dump.academy/keksobooking', noticesForm, onSubmitSuccess, onSubmitError);
+    evt.preventDefault();
+  });
+
+  mapPinMain.addEventListener('mouseup', function () {
     /** появление метоки на карте */
     sectionMap.classList.remove('map--faded');
     /** отменяет disabled */
     noticesForm.classList.remove('notice__form--disabled');
     setFormsDisabled(false);
     /** запись адриса */
-    setPinsDisplay('inline-block');
-    /** добовляю в поля формы disabled */
-    var address = noticesForm.querySelector('input[name=address]');
-    address.disabled = true;
-    var formReset = noticesForm.querySelector('.form__reset');
-    /** перезагрузил страницу при очистке формы */
-    formReset.addEventListener('mouseup', function () {
-      location.reload();
-    });
-    mapPinMap.addEventListener('mousedown', window.onMouseDown);
+    window.setPinsDisplay('inline-block');
   });
 
   var price = noticesForm.querySelector('#price');

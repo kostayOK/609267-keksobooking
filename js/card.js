@@ -6,7 +6,7 @@
     var laying = descriptionTemplate.cloneNode(true);
     laying.querySelector('h3').textContent = data.offer.title;
     laying.querySelector('.popup__price').textContent = data.offer.price + '\u20bd' + '/ночь';
-    laying.querySelector('h4').textContent = window.data.choiceTypeHousing(data.offer.type);
+    laying.querySelector('h4').textContent = window.choiceTypeHousing(data.offer.type);
     laying.querySelector('h4').nextElementSibling.nextElementSibling.textContent = 'Заезд после ' + data.offer.checkin + ',' + ' выезд до ' + data.offer.checkout;
     /** цикл клонирует img  и выводит фото */
     var ulPopupPictures = laying.querySelector('.popup__pictures');
