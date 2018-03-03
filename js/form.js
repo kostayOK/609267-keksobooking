@@ -1,7 +1,6 @@
 'use strict';
 (function () {
   var sectionMap = document.querySelector('.map');
-  var pinsContainer = document.querySelector('.map__pins');
   /** для перетаскивание элимента */
   var mapPinMain = document.querySelector('.map__pin--main');
   /** input для записи адреса */
@@ -13,19 +12,6 @@
     noticesForm.reset();
   });
   mapPinMain.addEventListener('mousedown', window.onMouseDown);
-
-  window.setPinsDisplay = function (display) {
-    /** прячу все элименты ! метки и табличку с описаниями */
-    /** setPinsDisplay - отрисовка метки */
-    for (var i = 0; i < pinsContainer.children.length; i++) {
-      if (pinsContainer.children[i].classList.contains('map__pin')) {
-        pinsContainer.children[i].style.display = display;
-      }
-      if (pinsContainer.children[i].classList.contains('map__pin--main')) {
-        pinsContainer.children[i].style.display = 'inline-block';
-      }
-    }
-  };
   var setFormsDisabled = function (flag) {
     /** отключение полей формы .notice__form */
     /** добовляю в поля формы disabled */
@@ -48,18 +34,23 @@
     inputAddress.value = (rect.x - (rect.width / 2)) + ',' + (rect.y - (rect.height / 2));
   };
   setDefaultAddress();
+
   var errors = document.querySelector('.errors');
-  var onSubmitError = function (message) {
+  var displayError = function (message) {
     errors.textContent = message;
   };
+
+  var onSubmitError = function (message) {
+    displayError(message);
+  };
+
   var onSubmitSuccess = function () {
     noticesForm.reset();
-    window.setPinsDisplay('none');
     setDefaultAddress();
     sectionMap.classList.add('map--faded');
     noticesForm.classList.add('notice__form--disabled');
     setFormsDisabled(true);
-    window.setPinsDisplay('none');
+    window.map.unloadSimilar();
     mapPinMain.style.left = mapPinMain.style.top = '';
   };
 
@@ -75,7 +66,7 @@
     noticesForm.classList.remove('notice__form--disabled');
     setFormsDisabled(false);
     /** запись адриса */
-    window.setPinsDisplay('inline-block');
+    window.map.loadSimilar();
   });
 
   var price = noticesForm.querySelector('#price');
