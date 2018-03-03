@@ -7,6 +7,9 @@
     /** начальные координаты pin */
     var startLeft = pinStart.left;
     var startTop = pinStart.top;
+    /** при нажатии получаю начальные координаты */
+    ball.style.left = parseInt(startLeft, 10) + 'px';
+    ball.style.top = parseInt(startTop, 10) + 'px';
     /** начальные координаты мыши */
     var shiftX = e.pageX;
     var shiftY = e.pageY;
@@ -21,6 +24,7 @@
       ball.style.left = parseInt(startLeft, 10) + resultLeft + 'px';
       ball.style.top = parseInt(startTop, 10) + resultTop + 'px';
     }
+
     mapPins.addEventListener('mousemove', onMouseMove);
     // 4. отследить окончание переноса
     var onMouseUp = function () {
