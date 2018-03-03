@@ -48,10 +48,11 @@
     inputAddress.value = (rect.x - (rect.width / 2)) + ',' + (rect.y - (rect.height / 2));
   };
   setDefaultAddress();
+  var errors = document.querySelector('.errors');
   var onSubmitError = function (message) {
-    alert(message);
+    errors.textContent = message;
   };
-  var onSubmitSuccess = function (data) {
+  var onSubmitSuccess = function () {
     noticesForm.reset();
     window.setPinsDisplay('none');
     setDefaultAddress();
