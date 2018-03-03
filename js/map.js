@@ -11,8 +11,16 @@
   /** секция map */
   var sectionMap = document.querySelector('.map');
   var mapFaded = document.querySelector('.map__pins');
-  var arrObj = window.data.generateData();
-  renderMap(mapFaded, arrObj);
+  /** вывожу ошибки в случие если не удалось загрузить */
+  var errors = document.querySelector('.errors');
+  var onEror = function (message) {
+    errors.textContent = message;
+  };
+  var onSuccess = function (data) {
+    renderMap(mapFaded, data);
+    window.setPinsDisplay('none');
+  };
+  window.backend.download('https://js.dump.academy/keksobooking/data/', onSuccess, onEror);
   var labelsHandler = function (ev) {
     /** поклюку на метку отрисоввываю предложение и удаляю */
     /** складываю элименты для отрисовки в dom */
@@ -30,7 +38,10 @@
     }
     /** нужна такая магия, потому что если мы напишем просто if(index), то это не сработает для index === 0 */
     if (typeof index !== 'undefined') {
-      sectionMap.appendChild(window.createOffer(arrObj[index]));
+      window.backend.download('https://js.dump.academy/keksobooking/data/', function (data) {
+        sectionMap.appendChild(window.createOffer(data[index]));
+      }, onEror);
+
     }
   };
   /** по клюку на метку если есть dataset  отрисовываю карточку */
